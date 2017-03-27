@@ -103,11 +103,16 @@ class MattermostMarkdownRenderer extends marked.Renderer {
 
     codespan(text) {
         let output = text;
+        let latexInline = /\$([^\$]*)\$/;
 
         if (this.formattingOptions.searchPatterns) {
             const tokens = new Map();
             output = TextFormatting.highlightSearchTerms(output, tokens, this.formattingOptions.searchPatterns);
             output = TextFormatting.replaceTokens(output, tokens);
+        }
+        
+        if (output.match(latexInline)) {
+          output = katex.renderToString(output, {throwOnError: false, displayMode: false});
         }
 
         return (
